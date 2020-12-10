@@ -21,7 +21,7 @@ void Saver::saveVideo()
     {
         if (start)
         {
-            std::string filename = filepath + currentDateToString() + ".mp4";
+            std::string filename = filepath + "/" + currentDateToString() + ".mp4";
             writer = cv::VideoWriter(filename, myFourCC, rate, size, true);
 
             while (start)

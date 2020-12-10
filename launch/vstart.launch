@@ -1,0 +1,6 @@
+<launch>
+	<arg name="filepath" default="/home/lqx" />
+	
+	<node name ="VideoSaver" pkg="video_saver" type="saver" args="$(arg filepath)" />
+
+</launch>
