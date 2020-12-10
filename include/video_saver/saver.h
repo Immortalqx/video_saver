@@ -2,6 +2,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 #include "ros/ros.h"
+#include "std_msgs/String.h"
 
 class Saver
 {
@@ -13,13 +14,16 @@ private:
     std::string filepath;
     int myFourCC = cv::VideoWriter::fourcc('m', 'p', '4', 'v');//mp4
 
-    int count = -999;
+    ros::NodeHandle n;
+    ros::Subscriber sub;
+
+    static void check(const std_msgs::String::ConstPtr &msg);
 
     static std::string currentDateToString();
 
-    bool check();
-
 public:
+    static bool start;
+
     Saver(int index, const std::string &filepath);
 
     void saveVideo();

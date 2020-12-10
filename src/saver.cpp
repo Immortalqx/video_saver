@@ -8,10 +8,10 @@ Saver::Saver(int index, const std::string &filepath)
     videoCapture.set(cv::CAP_PROP_FPS, 30);
     size = cv::Size(640, 480);
     rate = 30;
-//    size = cv::Size(videoCapture.get(cv::CAP_PROP_FRAME_WIDTH), videoCapture.get(cv::CAP_PROP_FRAME_HEIGHT));
-//    rate = videoCapture.get(cv::CAP_PROP_FPS);
 
     this->filepath = filepath;
+
+    sub = n.subscribe("/Camera/Save", 10, check);
 }
 
 void Saver::saveVideo()
@@ -19,32 +19,29 @@ void Saver::saveVideo()
     cv::Mat frame;
     while (ros::ok() && videoCapture.isOpened())
     {
-        bool start = check();
         if (start)
         {
             std::string filename = filepath + currentDateToString() + ".mp4";
             writer = cv::VideoWriter(filename, myFourCC, rate, size, true);
 
-            while (check())
+            while (start)
             {
                 if (videoCapture.read(frame))
                 {
                     writer << frame;
-
-                    //cv::imshow("frame", frame);//功能实现并且检查完毕后要注释掉这句话
-                    //if (cv::waitKey(1) >= 0) break;  //这行代码似乎也没啥用
+                    cv::imshow("frame", frame);//功能实现并且检查完毕后要注释掉这句话
+                    if (cv::waitKey(1) >= 0) break;  //这行代码似乎也没啥用
                 }
                 else
                     break;
 
+                ros::spinOnce();
             }
             cv::destroyAllWindows();
             writer.release();
             start = false;
         }
-        if (count > 5000)
-            break;
-
+        ros::spinOnce();
     }
 }
 
@@ -63,17 +60,19 @@ std::string Saver::currentDateToString()
     return str;
 }
 
-bool Saver::check()
+void Saver::check(const std_msgs::String::ConstPtr &msg)
 {
-    //TODO
-    // 增加一个判断函数，用于动态的开启和关闭 视频保存 功能
-    // 接受ROS节点的消息，通过true false判断开启和关闭
-    // 内嵌于saveVideo函数中
-    // 后续可能还得把saveVideo改成回调函数并且加入动态的视频名称
-    count++;
-    if (count < 0 || (count > 1000 && count < 2000) || count > 3000)
-        return false;
+    std::string str = msg->data;
+    if (str == "start")
+    {
+        ROS_INFO_STREAM("Video starts saving!");
+        start = true;
+    }
     else
-        return true;
+    {
+        ROS_INFO_STREAM("End of video save!");
+        start = false;
+    }
+
 }
 
