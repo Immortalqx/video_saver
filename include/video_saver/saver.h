@@ -13,9 +13,11 @@ private:
     std::string filepath;
     int myFourCC = cv::VideoWriter::fourcc('m', 'p', '4', 'v');//mp4
 
+    int count = -999;
+
     static std::string currentDateToString();
 
-    static bool check();
+    bool check();
 
 public:
     Saver(int index, const std::string &filepath);

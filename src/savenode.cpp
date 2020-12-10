@@ -2,7 +2,7 @@
 
 int main()
 {
-    Saver saver(0, "/home/lqx/");
+    Saver saver(2, "/home/lqx/");
 
     saver.saveVideo();
 

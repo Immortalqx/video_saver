@@ -3,8 +3,13 @@
 Saver::Saver(int index, const std::string &filepath)
 {
     videoCapture.open(index);
-    size = cv::Size(videoCapture.get(cv::CAP_PROP_FRAME_WIDTH), videoCapture.get(cv::CAP_PROP_FRAME_HEIGHT));
-    rate = videoCapture.get(cv::CAP_PROP_FPS);
+    videoCapture.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+    videoCapture.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+    videoCapture.set(cv::CAP_PROP_FPS, 30);
+    size = cv::Size(640, 480);
+    rate = 30;
+//    size = cv::Size(videoCapture.get(cv::CAP_PROP_FRAME_WIDTH), videoCapture.get(cv::CAP_PROP_FRAME_HEIGHT));
+//    rate = videoCapture.get(cv::CAP_PROP_FPS);
 
     this->filepath = filepath;
 }
@@ -12,7 +17,8 @@ Saver::Saver(int index, const std::string &filepath)
 void Saver::saveVideo()
 {
     cv::Mat frame;
-    while (ros::ok() && videoCapture.isOpened())
+    //while (ros::ok() && videoCapture.isOpened())
+    while (videoCapture.isOpened())
     {
         bool start = check();
         if (start)
@@ -26,15 +32,19 @@ void Saver::saveVideo()
                 {
                     cv::imshow("frame", frame);//TODO 功能实现并且检查完毕后要注释掉这句话
                     writer << frame;
-                    if (cv::waitKey(20) >= 0) break;
+                    if (cv::waitKey(1) >= 0) break;  //这行代码似乎也没啥用
                 }
                 else
                     break;
 
             }
+            cv::destroyAllWindows();
             writer.release();
             start = false;
         }
+        if (count > 5000)
+            break;
+
     }
 }
 
@@ -60,7 +70,10 @@ bool Saver::check()
     // 接受ROS节点的消息，通过true false判断开启和关闭
     // 内嵌于saveVideo函数中
     // 后续可能还得把saveVideo改成回调函数并且加入动态的视频名称
-
-    return false;
+    count++;
+    if (count < 0 || (count > 1000 && count < 2000) || count > 3000)
+        return false;
+    else
+        return true;
 }
 
