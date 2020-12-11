@@ -3,6 +3,19 @@
 Saver::Saver(int index, const std::string &filepath)
 {
     videoCapture.open(index);
+
+    int i = 0;
+    while (!videoCapture.isOpened())
+    {
+        ROS_ERROR("Can't open camera by index: %d", index);
+        ROS_ERROR("Waiting......");
+        videoCapture.open(index);
+        sleep(2);
+        i++;
+        if (i > 3)
+            abort();
+    }
+
     videoCapture.set(cv::CAP_PROP_FRAME_WIDTH, 640);
     videoCapture.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
     videoCapture.set(cv::CAP_PROP_FPS, 30);
