@@ -41,9 +41,12 @@ void Saver::saveVideo()
             {
                 if (videoCapture.read(frame))
                 {
+
+                    ROS_INFO("Recording......");
+
                     writer << frame;
-                    cv::imshow("frame", frame);//功能实现并且检查完毕后要注释掉这句话
-                    if (cv::waitKey(1) >= 0) break;  //这行代码似乎也没啥用
+//                    cv::imshow("frame", frame);//功能实现并且检查完毕后要注释掉这句话
+//                    if (cv::waitKey(1) >= 0) break;  //这行代码似乎也没啥用
                 }
                 else
                     break;
