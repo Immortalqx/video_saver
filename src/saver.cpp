@@ -1,58 +1,48 @@
 #include "../include/video_saver/saver.h"
 
-Saver::Saver(int index, const std::string &filepath)
+Saver::Saver(const std::string &filepath, const std::string &topic_1, const std::string &topic_2)
 {
-    videoCapture.open(index);
-
-    int i = 0;
-    while (!videoCapture.isOpened())
-    {
-        ROS_ERROR("Can't open camera by index: %d", index);
-        ROS_ERROR("Waiting......");
-        videoCapture.open(index);
-        sleep(2);
-        i++;
-        if (i > 3)
-            abort();
-    }
-
-    videoCapture.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-    videoCapture.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-    videoCapture.set(cv::CAP_PROP_FPS, 30);
-    size = cv::Size(640, 480);
-    rate = 30;
-
     this->filepath = filepath;
-
+    image_transport::ImageTransport it(n);
+    sub_1 = it.subscribe(topic_1, 10, imageCallback_1);
+    sub_2 = it.subscribe(topic_2, 10, imageCallback_2);
     sub = n.subscribe("/robo_air/camera_control", 10, check);
 }
 
-void Saver::saveVideo()
+void Saver::run()
 {
-    cv::Mat frame;
-    while (ros::ok() && videoCapture.isOpened())
+    int rate = 30;
+    cv::Size size_1 = cv::Size(640, 480);
+    cv::Size size_2 = cv::Size(848, 800);
+    while (ros::ok())
     {
         if (start)
         {
-            std::string filename = filepath + "/" + currentDateToString() + ".mp4";
-            writer = cv::VideoWriter(filename, myFourCC, rate, size, true);
+            std::string filename_1 = filepath + "/" + currentDateToString() + "topic1" + ".mp4";
+            writer_1 = cv::VideoWriter(filename_1, myFourCC, rate, size_1, true);
+
+            std::string filename_2 = filepath + "/" + currentDateToString() + "topic2" + ".mp4";
+            writer_2 = cv::VideoWriter(filename_2, myFourCC, rate, size_2, true);
 
             while (start)
             {
-                if (videoCapture.read(frame))
+                if (!frames_1.empty())
                 {
-
-                    ROS_INFO("Recording......");
-
-                    writer << frame;
+                    ROS_INFO("Recording Topic1......");
+                    writer_1 << frames_1.top();
+                    frames_1.pop();
                 }
-                else
-                    break;
-
+                if (!frames_2.empty())
+                {
+                    ROS_INFO("Recording Topic2......");
+                    writer_2 << frames_2.top();
+                    frames_2.pop();
+                }
                 ros::spinOnce();
             }
             cv::destroyAllWindows();
-            writer.release();
+            writer_1.release();
+            writer_2.release();
             start = false;
         }
         ros::spinOnce();
@@ -90,3 +80,34 @@ void Saver::check(const std_msgs::Bool::ConstPtr &msg)
 
 }
 
+void Saver::imageCallback_1(const sensor_msgs::ImageConstPtr &msg)
+{
+    try
+    {
+        if (start)
+        {
+            ROS_INFO("topic 1 received!");
+            frames_1.push(cv_bridge::toCvShare(msg, "bgr8")->image);
+        }
+    }
+    catch (cv_bridge::Exception &e)
+    {
+        ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
+    }
+}
+
+void Saver::imageCallback_2(const sensor_msgs::ImageConstPtr &msg)
+{
+    try
+    {
+        if (start)
+        {
+            ROS_INFO("topic 2 received!");
+            frames_2.push(cv_bridge::toCvShare(msg, "bgr8")->image);
+        }
+    }
+    catch (cv_bridge::Exception &e)
+    {
+        ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
+    }
+}
