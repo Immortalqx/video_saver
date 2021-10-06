@@ -208,7 +208,7 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 set(OpenCV_DIR /usr/local/share/OpenCV)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3 REQUIRED)
 
 add_library(${PROJECT_NAME} src/saver.cpp)
 

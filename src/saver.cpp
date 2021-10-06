@@ -24,7 +24,7 @@ Saver::Saver(int index, const std::string &filepath)
 
     this->filepath = filepath;
 
-    sub = n.subscribe("/Camera/Save", 10, check);
+    sub = n.subscribe("/robo_air/camera_control", 10, check);
 }
 
 void Saver::saveVideo()
@@ -45,8 +45,6 @@ void Saver::saveVideo()
                     ROS_INFO("Recording......");
 
                     writer << frame;
-//                    cv::imshow("frame", frame);//功能实现并且检查完毕后要注释掉这句话
-//                    if (cv::waitKey(1) >= 0) break;  //这行代码似乎也没啥用
                 }
                 else
                     break;
@@ -76,10 +74,10 @@ std::string Saver::currentDateToString()
     return str;
 }
 
-void Saver::check(const std_msgs::String::ConstPtr &msg)
+void Saver::check(const std_msgs::Bool::ConstPtr &msg)
 {
-    std::string str = msg->data;
-    if (str == "start")
+    bool record = msg->data;
+    if (record)
     {
         ROS_INFO_STREAM("Video starts saving!");
         start = true;

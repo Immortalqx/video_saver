@@ -2,7 +2,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 #include "ros/ros.h"
-#include "std_msgs/String.h"
+#include "std_msgs/Bool.h"
 
 class Saver
 {
@@ -17,7 +17,7 @@ private:
     ros::NodeHandle n;
     ros::Subscriber sub;
 
-    static void check(const std_msgs::String::ConstPtr &msg);
+    static void check(const std_msgs::Bool::ConstPtr &msg);
 
     static std::string currentDateToString();
 
