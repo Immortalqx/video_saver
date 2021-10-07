@@ -9,15 +9,23 @@
 
 ```bash
 # 指定所有参数
-rosrun video_saver saver /robo_air/camera_control /d435i/color/image_raw /t265/fisheye2/image_raw ~ 1920 1080 848 800 30 30
+# 保存单个节点视频
+rosrun video_saver saver 1 /robo_air/camera_control /d435i/color/image_raw ~ 1920 1080 30
+# 保存两个节点视频
+rosrun video_saver saver 2 /robo_air/camera_control /d435i/color/image_raw /t265/fisheye2/image_raw ~ 1920 1080 848 800 30 30
 # 指定部分参数
-rosrun video_saver saver /robo_air/camera_control /d435i/color/image_raw /t265/fisheye2/image_raw ~
+# 保存单个节点视频
+rosrun video_saver saver 1 /robo_air/camera_control /d435i/color/image_raw ~
+# 保存两个节点视频
+rosrun video_saver saver 2 /robo_air/camera_control /d435i/color/image_raw /t265/fisheye2/image_raw ~
 ```
 
 **通过roslaunch启动：**
 
 ```bash
-roslaunch video_saver vstart.launch
+roslaunch video_saver single_save.launch
+# or
+roslaunch video_saver double_save.launch
 ```
 
 ### 发布控制话题

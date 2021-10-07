@@ -10,6 +10,9 @@
 class Saver
 {
 private:
+    //single or double
+    int topic_num = 1;
+
     //image size from topic 1
     cv::Size size_1;
     //image size from topic 2
@@ -48,17 +51,30 @@ private:
     //get current data
     static std::string currentDateToString();
 
+    //save video from single topic
+    void single_run();
+
+    //save video from single topic
+    void double_run();
+
 public:
     static bool start;
     static std::stack<cv::Mat> frames_1;
     static std::stack<cv::Mat> frames_2;
 
-    Saver(const std::string &control_topic,
+    Saver(int topic_num,
+          const std::string &control_topic,
           const std::string &topic_1, const std::string &topic_2,
           const std::string &filepath,
           int width_1 = 640, int height_1 = 480,
           int width_2 = 848, int height_2 = 800,
           int rate_1 = 30, int rate_2 = 30);
+
+    Saver(int topic_num,
+          const std::string &control_topic,
+          const std::string &topic_1,
+          const std::string &filepath,
+          int width_1 = 640, int height_1 = 480, int rate_1 = 30);
 
     static Saver *getSaver(int argc, char **argv);
 

@@ -1,0 +1,33 @@
+<launch>
+    <arg name="topic_num" default="2"/>
+
+    <arg name="control_topic" default="/robo_air/camera_control"/>
+    <arg name="image_topic_1" default="/d435i/color/image_raw"/>
+    <arg name="image_topic_2" default="/t265/fisheye2/image_raw"/>
+
+    <arg name="save_path" default="/home/immortalqx"/>
+
+    <arg name="width_1" default="1920"/>
+    <arg name="height_1" default="1080"/>
+
+    <arg name="width_2" default="848"/>
+    <arg name="height_2" default="800"/>
+
+    <arg name="rate_1" default="30"/>
+    <arg name="rate_2" default="30"/>
+
+    <node name="VideoSaver" pkg="video_saver" type="saver"
+     args="$(arg topic_num) $(arg control_topic) $(arg image_topic_1) $(arg image_topic_2) $(arg save_path)
+            $(arg width_1) $(arg height_1) $(arg width_2) $(arg height_2) 
+            $(arg rate_1) $(arg rate_2)"
+     output="screen"/>
+
+</launch>
+
+<!--
+	test cmd
+	start:
+		rostopic pub /robo_air/camera_control std_msgs/Bool true 
+	end:
+		rostopic pub /robo_air/camera_control std_msgs/Bool false
+-->
